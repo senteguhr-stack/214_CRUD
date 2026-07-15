@@ -145,3 +145,42 @@ app.put('/biodata/:id', async (req, res) => {
     }
 
 });
+/* ===========================
+        DELETE Data
+=========================== */
+app.delete('/biodata/:id', async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `DELETE FROM biodata
+             WHERE id = $1
+             RETURNING *`,
+            [req.params.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "Data tidak ditemukan"
+            });
+        }
+
+        res.status(200).json({
+            message: "Data berhasil dihapus",
+            data: result.rows[0]
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+// Menjalankan Server
+app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
+});
